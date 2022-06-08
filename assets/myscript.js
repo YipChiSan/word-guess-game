@@ -1,4 +1,7 @@
 let words = ["word", "wins", "loss", "editior", "realise", "studio","long", "programmer", "newspaper", "television", "java"];
+let selectedIndex;
+let word;
+let numOfIncorrectIndex;
 let isGameRunning = false;
 let selectedLetter = null;
 let spanInterval;
@@ -32,7 +35,8 @@ function startGame() {
 }
 
 function renderRandomWord() {
-    let word = words[Math.floor(Math.random()*words.length)];
+    word = words[Math.floor(Math.random()*words.length)];
+    numOfIncorrectIndex = word.length - 2;
     let firstNonBlank = Math.floor(Math.random() * word.length);
     let display = document.querySelector('#display');
     let secondNonBlank;
@@ -50,6 +54,7 @@ function renderRandomWord() {
             letter.textContent = "_";
             letter.addEventListener("click", spanClickHandler);
             letter.style.color = "red";
+            letter.id = i;
         }
         letter.style.margin = "4px";
         display.appendChild(letter);
@@ -58,6 +63,7 @@ function renderRandomWord() {
 
 function spanClickHandler(event) {
     if (selectedLetter == null) {
+        selectedIndex = Number(event.target.id);
         selectedLetter = event.target;
         spanInterval = setInterval(function () {
             selectedLetter.style.visibility = (selectedLetter.style.visibility == 'hidden' ? '' : 'hidden');
@@ -71,18 +77,27 @@ function spanKeyDownHandler(event) {
         let dict="qwertyuiopasdfghjklzxcvbnm";
         
         if(dict.includes(event.key.toLowerCase())) {
+            if (word.charAt(selectedIndex) === event.key.toLowerCase()) {
+                numOfIncorrectIndex--;
+            } else if (word.charAt(selectedIndex) === selectedLetter.textContent) {
+                numOfIncorrectIndex++;
+            }
             selectedLetter.textContent = event.key.toLowerCase();
             selectedLetter.style.visibility = '';
             selectedLetter = null;
             clearInterval(spanInterval);
             
         } else if (event.key === "Backspace") {
+            if (word.charAt(selectedIndex) === selectedLetter.textContent) {
+                numOfIncorrectIndex++;
+            }
             selectedLetter.textContent = "_";
             selectedLetter.style.visibility = '';
             selectedLetter = null;
             clearInterval(spanInterval);
             
         }
+        console.log(numOfIncorrectIndex);
     }
 }
 
