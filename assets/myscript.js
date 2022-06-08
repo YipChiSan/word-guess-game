@@ -1,6 +1,7 @@
 let words = ["word", "wins", "loss", "editior", "realise", "studio","long", "programmer", "newspaper", "television", "java"];
 let isGameRunning = false;
-let selectedLetter;
+let selectedLetter = null;
+let spanInterval;
 
 function init() {
     let wins;
@@ -21,6 +22,8 @@ function init() {
 
     document.querySelector('#wins').textContent = "Wins: " + wins;
     document.querySelector('#losses').textContent = "Losses: " + losses;
+    document.querySelector('#start').addEventListener('click', startGame);
+    document.addEventListener("keydown", spanKeyDownHandler);
 }
 
 function startGame() {
@@ -42,36 +45,45 @@ function renderRandomWord() {
     for (let i = 0; i < word.length; i++) {
         letter = document.createElement("span");
         if (i == firstNonBlank || i == secondNonBlank) {
-            letter.innerHTML = word.charAt(i);
+            letter.textContent = word.charAt(i);
         } else {
-            letter.innerHTML = "_";
+            letter.textContent = "_";
+            letter.addEventListener("click", spanClickHandler);
+            letter.style.color = "red";
         }
-        letter.addEventListener("click", spanClickHandler);
-        letter.addEventListener("keydown", spanKeyDownHandler);
         letter.style.margin = "4px";
         display.appendChild(letter);
     }
 }
 
 function spanClickHandler(event) {
-    selectedLetter = event.target;
-    setInterval(function () {
-        selectedLetter.style.visibility = (selectedLetter.style.visibility == 'hidden' ? '' : 'hidden');
-    }, 500);
+    if (selectedLetter == null) {
+        selectedLetter = event.target;
+        spanInterval = setInterval(function () {
+            selectedLetter.style.visibility = (selectedLetter.style.visibility == 'hidden' ? '' : 'hidden');
+        }, 500);
+    }
+
 }
 
 function spanKeyDownHandler(event) {
-    let dict="qwertyuiopasdfghjklzxcvbnm";
-    if(dict.includes(event.key.toLowerCase())) {
-        selectedLetter.textContent = event.key.toLowerCase();
-        selectedLetter = null;
-        clearInterval();
-    } else if (event.code == 8) {
-        selectedLetter.textContent = "_";
-        selectedLetter = null;
-        clearInterval();
+    if (selectedLetter != null) {
+        let dict="qwertyuiopasdfghjklzxcvbnm";
+        
+        if(dict.includes(event.key.toLowerCase())) {
+            selectedLetter.textContent = event.key.toLowerCase();
+            selectedLetter.style.visibility = '';
+            selectedLetter = null;
+            clearInterval(spanInterval);
+            
+        } else if (event.key === "Backspace") {
+            selectedLetter.textContent = "_";
+            selectedLetter.style.visibility = '';
+            selectedLetter = null;
+            clearInterval(spanInterval);
+            
+        }
     }
-
 }
 
 function startTimer() {
