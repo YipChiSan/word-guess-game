@@ -28,6 +28,14 @@ The completed application should meet the following criteria:
 
 - When a user refreshes or returns to the brower page, the win and loss counts should persist.
 
+## Deployment
+
+My app is deployed [here](https://yipchisan.github.io/word-guess-game/).
+
+## Capture
+
+![app capture](./assets/img/Capture.PNG)
+
 ## 💡 Notes
 
 Refer to the documentation:
