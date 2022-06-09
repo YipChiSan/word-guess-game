@@ -1,12 +1,12 @@
-let words = ["word", "wins", "loss", "editior", "realise", "studio","long", "programmer", "newspaper", "television", "java"];
+let words = ["word", "wins", "loss", "edit", "reveal", "studio","long", "short", "level", "soccer", "java"];
 let selectedIndex;
 let word;
 let numOfIncorrectIndex;
-let isGameRunning = false;
 let selectedLetter = null;
-let countDown = -1;
+let countDown;
 let isGameFinished = true;
 let spanInterval;
+let timerInterval;
 
 function init() {
     let wins;
@@ -29,10 +29,14 @@ function init() {
     document.querySelector('#losses').textContent = "Losses: " + losses;
     document.querySelector('#start').addEventListener('click', startGame);
     document.addEventListener("keydown", spanKeyDownHandler);
+    document.querySelector('#reset').addEventListener("click", resetScore);
 }
 
 function startGame() {
     isGameFinished = false;
+    countDown = 15;
+    let display = document.querySelector('#display');
+    display.innerHTML = '';
     renderRandomWord();
     startTimer();
 }
@@ -90,7 +94,7 @@ function spanKeyDownHandler(event) {
             selectedLetter.style.visibility = '';
             selectedLetter = null;
             clearInterval(spanInterval);
-            if (numOfIncorrectIndex === 0) {
+            if (numOfIncorrectIndex === 0 && !isGameFinished) {
                 let message = document.createElement("p");
                 let winCount = Number(localStorage.getItem("wins"));
                 winCount++;
@@ -101,6 +105,7 @@ function spanKeyDownHandler(event) {
                 display.appendChild(message);
                 document.querySelector('#wins').textContent = "Wins: " + winCount;
                 isGameFinished = true;
+                clearInterval(timerInterval);
             }
             
         } else if (event.key === "Backspace") {
@@ -118,6 +123,36 @@ function spanKeyDownHandler(event) {
 }
 
 function startTimer() {
+    timerInterval = setInterval(
+        function() {
+            if (!isGameFinished && countDown > 0) {
+                countDown--;
+                let timeDisplay = document.querySelector('#timer');
+                timeDisplay.textContent = "Remaining Time: " + countDown + "s";
+            } else if (!isGameFinished && countDown === 0) {
+                let message = document.createElement("p");
+                let lossCount = Number(localStorage.getItem("losses"));
+                lossCount++;
+                localStorage.setItem("losses", lossCount);
+                message.textContent = "You Lost!"
+                let display = document.querySelector('#display');
+                display.innerHTML = '';
+                display.appendChild(message);
+                document.querySelector('#losses').textContent = "Losses: " + lossCount;
+                isGameFinished = true;
+                clearInterval(timerInterval);
+            }
+        }, 1000
+    )
+}
+
+function resetScore() {
+    if (isGameFinished) {
+        localStorage.setItem("wins", 0);
+        localStorage.setItem("losses", 0);
+        document.querySelector('#losses').textContent = "Losses: 0" ;
+        document.querySelector('#wins').textContent = "Wins: 0";
+    }
 
 }
 
