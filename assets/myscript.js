@@ -4,6 +4,8 @@ let word;
 let numOfIncorrectIndex;
 let isGameRunning = false;
 let selectedLetter = null;
+let countDown = -1;
+let isGameFinished = true;
 let spanInterval;
 
 function init() {
@@ -30,6 +32,7 @@ function init() {
 }
 
 function startGame() {
+    isGameFinished = false;
     renderRandomWord();
     startTimer();
 }
@@ -62,7 +65,7 @@ function renderRandomWord() {
 }
 
 function spanClickHandler(event) {
-    if (selectedLetter == null) {
+    if (selectedLetter == null && !isGameFinished) {
         selectedIndex = Number(event.target.id);
         selectedLetter = event.target;
         spanInterval = setInterval(function () {
@@ -73,8 +76,9 @@ function spanClickHandler(event) {
 }
 
 function spanKeyDownHandler(event) {
-    if (selectedLetter != null) {
+    if (selectedLetter != null && !isGameFinished) {
         let dict="qwertyuiopasdfghjklzxcvbnm";
+        
         
         if(dict.includes(event.key.toLowerCase())) {
             if (word.charAt(selectedIndex) === event.key.toLowerCase()) {
@@ -86,6 +90,18 @@ function spanKeyDownHandler(event) {
             selectedLetter.style.visibility = '';
             selectedLetter = null;
             clearInterval(spanInterval);
+            if (numOfIncorrectIndex === 0) {
+                let message = document.createElement("p");
+                let winCount = Number(localStorage.getItem("wins"));
+                winCount++;
+                localStorage.setItem("wins", winCount);
+                message.textContent = "You Win!"
+                let display = document.querySelector('#display');
+                display.innerHTML = '';
+                display.appendChild(message);
+                document.querySelector('#wins').textContent = "Wins: " + winCount;
+                isGameFinished = true;
+            }
             
         } else if (event.key === "Backspace") {
             if (word.charAt(selectedIndex) === selectedLetter.textContent) {
